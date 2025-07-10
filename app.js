@@ -38,8 +38,16 @@ app.post("/articles",(req,res)=>{
 	let name = prompt("What is your name");
 })
 
-app.delete("/articles/:id",(req,res)=>{
-	res.send("article of this id is deleted")
+app.delete("/articles/:id",async (req,res)=>{
+	const id = parseInt(req.params.id,10)
+	try{
+		const articles = await pool.query("delete from articles where id = $1 returning *",[id]);
+		res.json(articles.rows);
+	}catch(err){
+		console.error("Error :",err.stack);
+		res.statusCode(404).json("message : File Not Found");
+	}
+	
 })
 
 app.put("/articles/:id",(req,res)=>{
