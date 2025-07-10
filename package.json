@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/sanmijingbrahma/PersonalBlogAPI#readme",
   "dependencies": {
+    "dotenv": "^17.2.0",
     "express": "^5.1.0"
   }
 }

@@ -1,7 +1,9 @@
 const express = require("express")
 const app = express();
 
-const PORT = 8000;
+require("dotenv").config();
+
+const PORT = process.env.PORT;
 
 app.use(express.json())
 
@@ -31,6 +33,6 @@ app.put("/articles/:id",(req,res)=>{
 
 
 app.listen(PORT,()=>{
-	console.log("I am Listening.....");
+	console.log(`listening at http://localhost:${PORT}`);
 })
 
