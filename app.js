@@ -1,6 +1,6 @@
 const express = require("express")
 const app = express();
-
+const pool = require('./db')
 require("dotenv").config();
 
 const PORT = process.env.PORT;
@@ -10,13 +10,28 @@ app.use(express.json())
 
 // Routes
 
-app.get("/articles",(req,res)=>{
-	res.send("Here are the Articles");
+app.get("/articles", async (req,res)=>{
+	try{
+		const articles = await pool.query("select * from articles");
+		res.json(articles.rows);
+	}catch(err){
+		console.error("Error :",err.stack);
+		res.statusCode(500).send("Server Error");
+	}
+
 })
 
 
-app.get("/articles/:id",(req,res)=>{
-	res.send("Here is the articles by this id");
+app.get("/articles/:id",async (req,res)=>{
+	const id = parseInt(req.params.id,10)
+	try{
+		const articles = await pool.query("select * from articles where id = $1",[id]);
+		res.json(articles.rows);
+	}catch(err){
+		console.error("Error :",err.stack);
+		res.statusCode(404).json("message : File Not Found");
+	}
+	
 })
 
 app.post("/articles",(req,res)=>{
