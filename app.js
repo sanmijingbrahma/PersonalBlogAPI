@@ -16,7 +16,7 @@ app.get("/articles", async (req,res)=>{
 		res.json(articles.rows);
 	}catch(err){
 		console.error("Error :",err.stack);
-		res.statusCode(500).send("Server Error");
+		res.status(500).send("Server Error");
 	}
 
 })
@@ -25,17 +25,30 @@ app.get("/articles", async (req,res)=>{
 app.get("/articles/:id",async (req,res)=>{
 	const id = parseInt(req.params.id,10)
 	try{
-		const articles = await pool.query("select * from articles where id = $1",[id]);
-		res.json(articles.rows);
+		const article = await pool.query("select * from articles where id = $1",[id]);
+		if(article.rows.length ===0){
+			res.status(404).json({message:"Not Found"})
+		}
+		res.send(article.rows);
 	}catch(err){
 		console.error("Error :",err.stack);
-		res.statusCode(404).json("message : File Not Found");
+		res.status(404).json({"message" : "File Not Found"});
 	}
 	
 })
 
-app.post("/articles",(req,res)=>{
-	let name = prompt("What is your name");
+app.post("/articles",async(req,res)=>{
+	const {title,body,tags} = req.body;
+	if(!body || !title){
+		return res.status(400).json({"message":"Bad Request"});
+	}
+	try{
+		const article = await pool.query('insert into articles(title,body,tags)values($1,$2,$3) returning *',[title,body,tags]);
+		res.status(201).send(article.rows);
+	}catch(err){
+		console.error(err.stack);
+		res.status(400).json({"message": "Bad Request!"});
+	}
 })
 
 app.delete("/articles/:id",async (req,res)=>{
@@ -45,13 +58,26 @@ app.delete("/articles/:id",async (req,res)=>{
 		res.json(articles.rows);
 	}catch(err){
 		console.error("Error :",err.stack);
-		res.statusCode(404).json("message : File Not Found");
+		res.status(404).json({"message": "File Not Found"});
 	}
 	
 })
 
-app.put("/articles/:id",(req,res)=>{
-	res.send("article of this id is updated.")
+app.put("/articles/:id", async(req,res)=>{
+	const id = parseInt(req.params.id);
+	const {title,body,tags} = req.body;
+	if(!body || !title){
+		return res.status(400).json({"message":"Bad Request"});
+	}
+
+	try{
+		const updated = await pool.query('UPDATE articles SET title=$1,body=$2,tags=$3 where id=$4 returning *',[title,body,tags,id]);
+		res.json(updated.rows);
+	}catch(err){
+		console.error("Error:",err.stack);
+		res.status(400).json({message:"Bad Request"})
+	}
+
 })
 
 
