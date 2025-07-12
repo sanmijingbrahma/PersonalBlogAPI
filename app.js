@@ -3,7 +3,7 @@ const app = express();
 const pool = require('./db')
 require("dotenv").config();
 
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 8000;
 
 app.use(express.json())
 
@@ -81,7 +81,7 @@ app.put("/articles/:id", async(req,res)=>{
 })
 
 
-app.listen(process.env.PORT || PORT,()=>{
+app.listen(PORT,()=>{
 	console.log(`listening at http://localhost:${PORT}`);
 })
 
