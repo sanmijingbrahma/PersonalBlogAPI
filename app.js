@@ -81,7 +81,7 @@ app.put("/articles/:id", async(req,res)=>{
 })
 
 
-app.listen(PORT,()=>{
+app.listen(process.env.PORT || PORT,()=>{
 	console.log(`listening at http://localhost:${PORT}`);
 })
 
